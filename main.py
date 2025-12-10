@@ -16,50 +16,46 @@ def shortest_path(rooms, doors, start, goal):
       - [] if no path exists.
     """
 
-    # Validate that start and goal are in the set of known rooms.
-    room_set = set(rooms)
-    if start not in room_set or goal not in room_set:
-        # If either endpoint is unknown, there is no path.
-        return []
-
-    # Trivial case: start == goal
+    # TODO Steps 1–3: Restate the problem and choose a graph representation.
+    # TODO Steps 4–5: Plan a BFS that tracks parents and stops when goal is found.
+    # TODO Step 6: Implement BFS and path reconstruction.
+    # TODO Step 7: Test with small maps (lines, branches, isolated rooms).
+    # TODO Step 8: Confirm complexity is about O(n + m).
+    # Edge case: no rooms
+    if not rooms:
+      return []
+    # Edge case: start == goal
     if start == goal:
-        return [start]
-
-    # Build adjacency list for an undirected graph. Include isolated rooms.
-    adj = {r: [] for r in rooms}
+      return [start] if start in rooms else []
+    # Build adjacency list
+    graph = {room: [] for room in rooms}
     for a, b in doors:
-        # Only add edges between known rooms (ignore doors referring to unknown rooms)
-        if a in adj and b in adj:
-            adj[a].append(b)
-            adj[b].append(a)
-
+      if a in graph and b in graph:
+        graph[a].append(b)
+        graph[b].append(a)
     # BFS
     from collections import deque
-
-    q = deque([start])
-    parent = {start: None}
-
+    visited = set()
+    parent = {}
+    queue = deque([start])
+    visited.add(start)
     found = False
-    while q:
-        cur = q.popleft()
-        if cur == goal:
-            found = True
-            break
-        for nbr in adj.get(cur, []):
-            if nbr not in parent:
-                parent[nbr] = cur
-                q.append(nbr)
-
+    while queue:
+      current = queue.popleft()
+      if current == goal:
+        found = True
+        break
+      for neighbor in graph.get(current, []):
+        if neighbor not in visited:
+          visited.add(neighbor)
+          parent[neighbor] = current
+          queue.append(neighbor)
     if not found:
-        return []
-
-    # Reconstruct path from goal back to start
-    path = []
-    node = goal
-    while node is not None:
-        path.append(node)
-        node = parent.get(node)
+      return []
+    # Reconstruct path
+    path = [goal]
+    while path[-1] != start:
+      path.append(parent[path[-1]])
     path.reverse()
     return path
 
